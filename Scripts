@@ -1,0 +1,11 @@
+Pra juntar os arquivos: 
+
+cd segments
+for %i in (*.ts) do @echo file '%i' >> list.txt   # no Windows
+
+# OU no Linux/Mac:
+for i in *.ts; do echo "file '$i'" >> list.txt; done
+
+
+FFMPEG
+ffmpeg -f concat -safe 0 -i list.txt -c copy ../video_final.mp4
