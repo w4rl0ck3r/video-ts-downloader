@@ -2,6 +2,7 @@ import requests
 import os
 import subprocess
 import argparse
+import shutil
 
 # Argumentos da linha de comando
 parser = argparse.ArgumentParser(description="Baixar segmentos .ts e juntar com ffmpeg.")
@@ -9,16 +10,16 @@ parser.add_argument("url", help="URL base do vídeo (sem o número do segmento)"
 parser.add_argument("-o", "--output", default="video_final.mp4", help="Nome do arquivo final de saída")
 args = parser.parse_args()
 
-# Base URL
-base_url = args.url.rstrip('/')  # Remove barra final, se houver
-
 # Diretórios e nomes
+base_url = args.url.rstrip('/')
 segment_dir = "segments"
+output_dir = "output"
 list_file = "list.txt"
 output_file = args.output
 
-# Cria diretório
+# Cria diretórios
 os.makedirs(segment_dir, exist_ok=True)
+os.makedirs(output_dir, exist_ok=True)
 
 # Baixar segmentos
 index = 0
@@ -41,7 +42,7 @@ with open(os.path.join(segment_dir, list_file), "w") as list_f:
 
 print(f"\n✅ Download finalizado. Total de segmentos baixados: {index}")
 
-# Muda para a pasta dos segmentos
+# Muda para o diretório de segmentos
 os.chdir(segment_dir)
 
 # Concatenar com ffmpeg
@@ -51,8 +52,22 @@ result = subprocess.run([
     "-i", list_file, "-c", "copy", output_file
 ])
 
+# Pós-processamento
 if result.returncode == 0:
     print(f"\n✅ Vídeo final criado com sucesso: {output_file}")
+
+    # Move vídeo para pasta output/
+    final_path = os.path.join("..", output_dir, output_file)
+    shutil.move(output_file, final_path)
+    print(f"📂 Vídeo movido para: {final_path}")
+
+    # Limpa arquivos temporários
+    print("🧹 Limpando arquivos temporários...")
+    os.remove(list_file)
+    for f in os.listdir():
+        if f.endswith(".ts"):
+            os.remove(f)
+    print("✅ Limpeza concluída.")
 else:
     print("\n❌ Erro ao concatenar os vídeos com ffmpeg.")
 
