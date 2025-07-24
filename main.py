@@ -1,14 +1,21 @@
 import requests
 import os
 import subprocess
+import argparse
 
-# URL base
-base_url = "https://vz-4f9a0d3b-3be.b-cdn.net/a58e37e2-bc16-413e-8590-3b5df62385b7/1080p/video"
+# Argumentos da linha de comando
+parser = argparse.ArgumentParser(description="Baixar segmentos .ts e juntar com ffmpeg.")
+parser.add_argument("url", help="URL base do vídeo (sem o número do segmento)")
+parser.add_argument("-o", "--output", default="video_final.mp4", help="Nome do arquivo final de saída")
+args = parser.parse_args()
+
+# Base URL
+base_url = args.url.rstrip('/')  # Remove barra final, se houver
 
 # Diretórios e nomes
 segment_dir = "segments"
 list_file = "list.txt"
-output_file = "../video_final.mp4"
+output_file = args.output
 
 # Cria diretório
 os.makedirs(segment_dir, exist_ok=True)
