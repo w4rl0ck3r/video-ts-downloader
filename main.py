@@ -72,7 +72,7 @@ elif args.csv:
             dir_name = row["dir_name"]
             video_num = row["video_num"]
             video_name = row["video_name"]
-            base_url = row["video_url"].rstrip('/')
+            base_url = row["base_url"].rstrip('/')
 
             final_filename = f"{video_num}_{video_name}.mp4"
             output_path = os.path.join("output", dir_name, final_filename)
